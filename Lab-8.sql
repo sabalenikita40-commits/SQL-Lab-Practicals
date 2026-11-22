@@ -77,77 +77,175 @@ SELECT * FROM Course;
 SELECT * FROM Enrollment;
 SELECT * FROM Fee;
 
--- student and their course 
-select s.name , c.course_name from student s 
+-- student and their course
+
+select s.name , c.course_name from student s
 inner join enrollment e
 on s.student_id = e.student_id
 inner join course c
 on e.course_id = c.course_id;
 
--- 1. Show the student name annd enroll_date for every enrollment
-select s.name , enroll_date from student s
-inner join enrollment e on s.student_id =  e.student_id;
+-- 1.show the student name and enrollment date for evry enrollment
 
--- 2 
-select c.course_name , e.enroll_date from course c 
-inner join enrollment e 
+select s.name, enroll_date from student s
+inner join enrollment e
+on s.student_id = e.student_id;
+
+-- 2
+select c.course_name, e.enroll_date from course c
+inner join enrollment e
 on c.course_id = e.course_id;
 
--- 3. Show the student name and course_name for every enrollment.
-select s.name , c.course_name from student s
-inner join enrollment e 
-on  s.student_id = e.student_id
+-- 3
+select s.name,c.course_name from student s
+inner join enrollment e
+on s.student_id = e.student_id
 inner join course c
 on e.course_id = c.course_id;
 
--- 4. Show the enroll_id and amount_paid for every payment.
-select e.enroll_id, f.amount_paid
-from enrollment e 
+
+-- 4
+select e.enroll_id,f.amount_paid from enrollment e
 inner join fee f
 on e.enroll_id = f.enroll_id;
 
--- 5. Show the student name and amount_paid for every payment.
+-- 5
 select s.name , f.amount_paid from student s
-inner join enrollment e 
+inner join enrollment e
 on s.student_id = e.student_id
 inner join fee f
 on e.enroll_id = f.enroll_id;
 
--- 6. Show the course_name and total amount_paid for every payment.
-select c.course_name ,f.amount_paid from course c
-inner join enrollment e 
+-- 6
+select c.course_name, f.amount_paid from course c
+inner join enrollment e
+on e.course_id = c.course_id
+inner join fee f
+on f.enroll_id = e.enroll_id;
+
+-- 7
+select s.name,c.course_name,f.amount_paid from student s
+inner join enrollment e
+on s.student_id = e.student_id
+inner join course c
 on c.course_id = e.course_id
 inner join fee f
-on e.enroll_id = f.enroll_id;
+on f.enroll_id = e.enroll_id;
 
--- 7. Show the student name, course_name and amount_paid for every payment .
-select s.name , c.course_name, f.amount_paid from student s 
-inner join enrollment e 
+-- 8
+select S.name,C.course_name FROM student S 
+LEFT JOIN  enrollment E 
+ON S.student_id = E.student_id
+LEFT JOIN course C 
+ON E.course_id = C.course_id;
+
+-- 9
+select S.name,C.course_name FROM student S
+INNER JOIN  enrollment E 
+ON S.student_id = E.student_id
+RIGHT JOIN course C 
+ON E.course_id = C.course_id;
+
+-- 10
+SELECT E.ENROLL_ID,F.AMOUNT_PAID FROM enrollment E 
+LEFT JOIN FEE F 
+ON E.enroll_id = F.ENROLL_ID;
+
+-- 11
+select * from student s
+inner join enrollment e
 on s.student_id = e.student_id
 inner join course c
 on e.course_id = c.course_id
-inner join fee f
-on e.enroll_id = f.enroll_id;
+where s.city="Pune" and c.course_name="SQL";
 
--- 8. Show all students with the courses they enrolled in, including students who have not enrolled anywhere.
-select s.name, c.course_name
-from student s
-left join enrollment e
+-- 12
+select s.name,sum(f.amount_paid) from student s
+inner join enrollment e
 on s.student_id = e.student_id
-left join course c
-on e.course_id = c.course_id;
+inner join fee f
+on e.enroll_id = f.enroll_id
+group by s.name 
+order by sum(amount_paid) desc
+limit 1;
 
--- 9. Show all courses with the names of students enrolled, including courses that have no students.
-select c.course_name , s.name from course c
-left join enrollment e on c.course_id = e.course_id 
-left join student s
-on e.student_id = s.student_id;
+-- 13
+select c.course_name,count(*) from student s
+inner join enrollment e
+on s.student_id = e.student_id
+inner join course c
+on e.course_id = c.course_id
+group by course_name;
 
--- 10. Show every enrollment with its payments, including enrollments that have no payment yet.
-select e.enroll_id, f.amount_paid
-from enrollment e
-left join fee f
-on e.enroll_id = f.enroll_id;
+-- 14 
+select s.name,count(*) from student s
+inner join enrollment e
+on s.student_id=e.student_id
+group by s.name
+having count(*)>1;
+
+-- 15 
+select c.course_name,sum(f.amount_paid) from course c
+inner join enrollment e
+on c.course_id = e.course_id
+inner join fee f
+on e.enroll_id=f.enroll_id
+group by c.course_name
+having sum(f.amount_paid)>20000;
+
+-- 16 
+select f.amount_paid,f.mode from fee f
+order by mode desc;
+
+-- 17
+select c.course_name from course c
+where c.course_id not in (select course_id from  enrollment);
+
+-- 18 
+select s.city,sum(f.amount_paid) from student s
+inner join enrollment e
+on s.student_id = e.student_id
+inner join fee f
+on e.enroll_id = f.enroll_id
+group by s.city
+having sum(f.amount_paid)>15000;
+
+-- 19 
+select * from student s
+inner join enrollment e 
+on s.student_id = e.student_id
+inner join fee f 
+on e.enroll_id = f.enroll_id
+group by s.student_id, s.name
+order by total_paid desc
+limit 3;
+
+-- Lab Questions
+-- 20
+select * from accounts a
+inner join transactions t
+on a.account_id = t.account_id;
+
+-- 21
+select a.Account_id, a.Account_type,a.balance, t.Transaction_id, t.Transaction_date, t.Transaction_type, t.Amount from accounts a 
+left join transactions t 
+on a.account_id = t.account_id;
+
+-- 22
+select a.Account_id, a.Account_type,a.balance, t.Transaction_id, t.Transaction_date, t.Transaction_type, t.Amount from accounts a 
+inner join transactions t 
+on a.account_id = t.account_id
+where transaction_type= "Deposite";
+
+-- 23 
+select a.Account_id, a.Account_type,a.balance, t.Transaction_id, t.Transaction_date, t.Transaction_type, t.Amount from accounts a 
+left join transactions t 
+on a.account_id = t.account_id
+where a.balance >30000 
+order by a.balance desc;
+
+
+
 
 
 
